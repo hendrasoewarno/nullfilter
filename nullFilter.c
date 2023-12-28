@@ -4,15 +4,6 @@
 #include <ntstrsafe.h>
 #include "udf.h"
 
-//
-//fltmc load nullFilter atau sc start nullFitler
-//sc query nullFilter
-//fltmc attach nullFilter C:
-//fltmc unload nullFilter atau sc stop nullFilter
-//sc delete nullFitler
-
-//untuk perintah fltmc silakan baca: https://ss64.com/nt/fltmc.html
-
 #pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
 
 //---------------------------------------------------------------------------
