@@ -6,6 +6,6 @@ BOOLEAN SubstringInUnicodeString(PUNICODE_STRING mainString, PUNICODE_STRING sub
 BOOLEAN StartsWithUnicodeString(PUNICODE_STRING mainString, PUNICODE_STRING substring);
 BOOLEAN EndsWithUnicodeString(PUNICODE_STRING mainString, PUNICODE_STRING substring);
 
-BOOLEAN isExecutableExtension(PUNICODE_STRING fullname, PUNICODE_STRING executableExtension);
+BOOLEAN isEndsWith(PUNICODE_STRING fullname, PUNICODE_STRING executableExtension);
 BOOLEAN isContainSubstr(PUNICODE_STRING fullname, PUNICODE_STRING allowedPath);
 

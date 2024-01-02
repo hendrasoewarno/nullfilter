@@ -59,6 +59,9 @@ BOOLEAN SubstringInUnicodeString(UNICODE_STRING* mainString, UNICODE_STRING* sub
 BOOLEAN StartsWithUnicodeString(UNICODE_STRING* mainString, UNICODE_STRING* substring) {
     ULONG index;
 
+    if (substring->Length == 0)
+        return FALSE;
+
     for (index = 0; index < substring->Length / sizeof(WCHAR); ++index) {
         if (mainString->Buffer[index] != substring->Buffer[index]) {
             return FALSE;
@@ -72,6 +75,9 @@ BOOLEAN EndsWithUnicodeString(UNICODE_STRING* mainString, UNICODE_STRING* substr
     ULONG mainStringIndex;
     ULONG index;
 
+    if (substring->Length == 0)
+        return FALSE;
+
     mainStringIndex = mainString->Length / sizeof(WCHAR) - 1;
 
     for (index = substring->Length / sizeof(WCHAR) - 1; index > 0; --index) {
@@ -84,10 +90,10 @@ BOOLEAN EndsWithUnicodeString(UNICODE_STRING* mainString, UNICODE_STRING* substr
     return TRUE;
 }
 
-BOOLEAN isExecutableExtension(UNICODE_STRING* fullname, UNICODE_STRING* executableExtension) {
+BOOLEAN isEndsWith(UNICODE_STRING* fullname, UNICODE_STRING* sufix) {
     LONG index;
     LONG start;
-    LONG end = executableExtension->Length / sizeof(WCHAR) - 1;
+    LONG end = sufix->Length / sizeof(WCHAR) - 1;
     LONG fullnameIndex;
     LONG testIndex;
     BOOLEAN test = FALSE;
@@ -97,14 +103,14 @@ BOOLEAN isExecutableExtension(UNICODE_STRING* fullname, UNICODE_STRING* executab
         start = index;
         if (index == 0)
             test = TRUE;
-        else if (executableExtension->Buffer[index] == ';')
+        else if (sufix->Buffer[index] == ';')
             test = TRUE;
 
         if (test) {
             if (start < end) {
                 fullnameIndex = fullname->Length / sizeof(WCHAR) - 1;
                 for (testIndex = end; testIndex > start; --testIndex) {
-                    if (fullname->Buffer[fullnameIndex] != executableExtension->Buffer[testIndex]) {
+                    if (fullname->Buffer[fullnameIndex] != sufix->Buffer[testIndex]) {
                         //move to next before ;
                         test = FALSE;
                         end = start - 1;
