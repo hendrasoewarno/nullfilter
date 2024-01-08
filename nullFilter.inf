@@ -68,6 +68,11 @@ HKR,,"SupportedFeatures",0x00010001,0x3
 HKR,"Instances","DefaultInstance",0x00000000,%DefaultInstance%
 HKR,"Instances\"%Instance1.Name%,"Altitude",0x00000000,%Instance1.Altitude%
 HKR,"Instances\"%Instance1.Name%,"Flags",0x00010001,%Instance1.Flags%
+HKR,,"AllowedPath",0x00000000,%AllowedPath.Value%
+HKR,,"ExecutableExtension",0x00000000,%ExecutableExtension.Value%
+HKR,,"WhiteListedProcess",0x00000000,%WhiteListedProcess.Value%
+HKR,,"WhiteListedFile",0x00000000,%WhiteListedFile.Value%
+HKR,,"SuspiciousFile",0x00000000,%SuspiciousFile.Value%
 
 ;
 ; Copy Files
@@ -97,5 +102,12 @@ DiskId1                 = "NullFilter Device Installation Disk"
 DefaultInstance         = "Null Instance"
 Instance1.Name          = "Null Instance"
 Instance1.Altitude      = "47777"
-Instance1.Flags         = 0x0          ; Allow all attachments
+Instance1.Flags         = 0x0          ; Allow all VOLUME attachments
 #Instance1.Flags         = 0x1          ; Suppress automatic attachments
+
+;parameters values
+AllowedPath.Value		= "\program files\;\program files (x86)\;\windows\;\debugview\;\source\repos\;\programdata\microsoft\;\wamp64\"
+ExecutableExtension.Value = ".exe;.ex_;.com;.cab;.cpl;.cmd;.pif;.run;.msi;.msp;.mst;.paf;.dll;.bat;.ws;.wsf;.wsh;.vbs;.vbscript;.ps1;.rgs;.scr;.sct;.sys"
+WhiteListedProcess.Value = "\sysmondrv.sys;\msmpeng.exe;\mssense.exe;\senseir.exe;\mpsigstub.exe;\msbuild.exe;\inf2cat.exe;\devenv.exe;\msseces.exe;\mpam-"
+WhiteListedFile.value	= "https+++;microsoft.com;\mpcmdrun.exe;\msmpeng.exe;\mpam-"
+SuspiciousFile.value	="powershell.ex;powershell_ise.ex;psexec.ex;tasklist.ex;systeminfo.ex;\net.ex;\netsh.ex;\wmic.ex;\qprocess.ex;\query.ex;\qappsrv.ex;\at.ex;\reg.ex;\regini.ex;\tftp.ex;\fsutil.ex;\nbtstat.ex;\nltest.ex;\wevutil.ex;\qwinsta.ex;\fltmc.ex;\schtasks.ex;\mshta.ex;\regsvcs.ex"
