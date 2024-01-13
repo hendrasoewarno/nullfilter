@@ -13,5 +13,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DbgengKernelMachineName>markas</DbgengKernelMachineName>
+    <TestCertificate>CN="WDKTestCert hendra,133483656555570356" | 5BDF481A59FFB65EB3EFF6DD9A53EAC4BB63F5EC</TestCertificate>
   </PropertyGroup>
 </Project>

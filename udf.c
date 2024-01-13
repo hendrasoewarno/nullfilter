@@ -176,10 +176,10 @@ BOOLEAN EndsWithUnicodeString(UNICODE_STRING* mainString, UNICODE_STRING* substr
 
 BOOLEAN isEndsWith(UNICODE_STRING* fullname, UNICODE_STRING* sufix) {
     LONG index;
-    LONG start;
-    LONG end = sufix->Length / sizeof(WCHAR) - 1;
-    LONG fullnameIndex;
-    LONG testIndex;
+    ULONG start;
+    ULONG end = sufix->Length / sizeof(WCHAR) - 1;
+    ULONG fullnameIndex;
+    ULONG testIndex;
     BOOLEAN test = FALSE;
 
     index = end;
@@ -219,13 +219,14 @@ BOOLEAN isEndsWith(UNICODE_STRING* fullname, UNICODE_STRING* sufix) {
 
 BOOLEAN isContainSubstr(PUNICODE_STRING fullname, PUNICODE_STRING allowedPath) {
     LONG index;
-    LONG end = allowedPath->Length / sizeof(WCHAR) - 1;
-    LONG start;
-    LONG fullnameIndex;
-    LONG substringIndex;
+    ULONG end = allowedPath->Length / sizeof(WCHAR) - 1;
+    ULONG start;
+    ULONG fullnameIndex;
+    ULONG substringIndex;
     BOOLEAN test = FALSE;
 
     index = end;
+
     while (index >= 0 && end > 0) {
         start = index;
         if (index == 0)

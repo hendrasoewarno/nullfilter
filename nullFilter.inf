@@ -26,7 +26,15 @@ NullFilter.DriverFiles  = 12            ;%windir%\system32\drivers
 ;; Default install sections
 ;;
 
-[DefaultInstall]
+;[DefaultInstall]
+;OptionDesc  = %ServiceDescription%
+;CopyFiles = NullFilter.DriverFiles
+
+[DefaultInstall.ntx86]
+OptionDesc  = %ServiceDescription%
+CopyFiles = NullFilter.DriverFiles
+
+[DefaultInstall.ntamd64]
 OptionDesc  = %ServiceDescription%
 CopyFiles = NullFilter.DriverFiles
 
@@ -37,7 +45,15 @@ AddService  = %ServiceName%,,NullFilter.Service
 ;; Default uninstall sections
 ;;
 
-[DefaultUninstall]
+;[DefaultUninstall]
+;DelFiles   = NullFilter.DriverFiles
+;LegacyUninstall=1
+
+[DefaultUninstall.ntx86]
+DelFiles   = NullFilter.DriverFiles
+LegacyUninstall=1
+
+[DefaultUninstall.ntamd64]
 DelFiles   = NullFilter.DriverFiles
 LegacyUninstall=1
 
@@ -108,6 +124,6 @@ Instance1.Flags         = 0x0          ; Allow all VOLUME attachments
 ;parameters values
 AllowedPath.Value		= "\program files\;\program files (x86)\;\windows\;\debugview\;\source\repos\;\programdata\microsoft\;\wamp64\"
 ExecutableExtension.Value = ".exe;.ex_;.com;.cab;.cpl;.cmd;.pif;.run;.msi;.msp;.mst;.paf;.dll;.bat;.ws;.wsf;.wsh;.vbs;.vbscript;.ps1;.rgs;.scr;.sct;.sys"
-WhiteListedProcess.Value = "\sysmondrv.sys;\msmpeng.exe;\mssense.exe;\senseir.exe;\mpsigstub.exe;\msbuild.exe;\inf2cat.exe;\devenv.exe;\msseces.exe;\mpam-"
+WhiteListedProcess.Value = "\sysmondrv.sys;\msmpeng.exe;\mssense.exe;\senseir.exe;\mpsigstub.exe;\msbuild.exe;\inf2cat.exe;\devenv.exe;\csc.exe;\msseces.exe;\mpam-"
 WhiteListedFile.value	= "https+++;microsoft.com;\mpcmdrun.exe;\msmpeng.exe;\mpam-"
-SuspiciousFile.value	="powershell.ex;powershell_ise.ex;psexec.ex;tasklist.ex;systeminfo.ex;\net.ex;\netsh.ex;\wmic.ex;\qprocess.ex;\query.ex;\qappsrv.ex;\at.ex;\reg.ex;\regini.ex;\tftp.ex;\fsutil.ex;\nbtstat.ex;\nltest.ex;\wevutil.ex;\qwinsta.ex;\fltmc.ex;\schtasks.ex;\mshta.ex;\regsvcs.ex"
+SuspiciousFile.value	="powershell.ex;powershell_ise.ex;psexec.ex;tasklist.ex;systeminfo.ex;\net.ex;\netsh.ex;\wmic.ex;\qprocess.ex;\query.ex;\qappsrv.ex;\at.ex;\reg.ex;\regini.ex;\tftp.ex;\fsutil.ex;\nbtstat.ex;\nltest.ex;\wevutil.ex;\qwinsta.ex;\fltmc.ex;\schtasks.ex;\mshta.ex;\regsvcs.ex;\vssadmin.ex"

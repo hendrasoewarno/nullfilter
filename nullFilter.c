@@ -31,7 +31,7 @@
 #define WHITELISTED_FILE            L"\\pagefile.sys;\\http+++;\\https+++;microsoft.com;\\mpcmdrun.exe;\\msmpeng.exe;\\mpam-"
 //https://blogs.jpcert.or.jp/en/2016/01/windows-commands-abused-by-attackers.html
 //https://redcanary.com/threat-detection-report/techniques/mshta/
-#define SUSPICIOUS_FILE             L"powershell.ex;powershell_ise.ex;psexec.ex;tasklist.ex;systeminfo.ex;\\net.ex;\\netsh.ex;\\wmic.ex;\\qprocess.ex;\\query.ex;\\qappsrv.ex;\\at.ex;\\reg.ex;\\regini.ex;\\tftp.ex;\\fsutil.ex;\\nbtstat.ex;\\nltest.ex;\\wevutil.ex;\\qwinsta.ex;\\fltmc.ex;\\schtasks.ex;\\mshta.ex;\\regsvcs.ex"
+#define SUSPICIOUS_FILE             L"powershell.ex;powershell_ise.ex;psexec.ex;tasklist.ex;systeminfo.ex;\\net.ex;\\netsh.ex;\\wmic.ex;\\qprocess.ex;\\query.ex;\\qappsrv.ex;\\at.ex;\\reg.ex;\\regini.ex;\\tftp.ex;\\fsutil.ex;\\nbtstat.ex;\\nltest.ex;\\wevutil.ex;\\qwinsta.ex;\\fltmc.ex;\\schtasks.ex;\\mshta.ex;\\regsvcs.ex;\\vssadmin.ex"
 #define CHECK_DOSNAME               FALSE
 
 //UNICODE_STRING executableExtension = { sizeof(EXECUTABLE_EXTENSION) - sizeof(WCHAR), sizeof(EXECUTABLE_EXTENSION), EXECUTABLE_EXTENSION };
@@ -150,7 +150,7 @@ FLT_PREOP_CALLBACK_STATUS FLTAPI PreOperationCreate(
                 //free memory
                 RtlFreeUnicodeString(&lcaseProcessName);
             }            
-            ExFreePool(processName);
+            ExFreePoolWithTag(processName, 'hew');
         }
                
         PFLT_FILE_NAME_INFORMATION  fileNameInfo;
@@ -194,7 +194,7 @@ FLT_PREOP_CALLBACK_STATUS FLTAPI PreOperationCreate(
                                     //delete VolumeName
                                     if (oriDosNameLength > 0 && szVolTempPath.Length > 0) {
                                         ULONG start = 0;
-                                        for (int i = oriDosNameLength; i < (DosName.Length - szVolTempPath.Length) / sizeof(WCHAR); i++) {
+                                        for (ULONG i = oriDosNameLength; i < (DosName.Length - szVolTempPath.Length) / sizeof(WCHAR); i++) {
                                             DosName.Buffer[i] = DosName.Buffer[i + szVolTempPath.Length / sizeof(WCHAR)];
                                             start++;
                                         }
