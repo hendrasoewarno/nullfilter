@@ -64,9 +64,9 @@ NTSTATUS ReadRegistryValueFromMiniFilter(
                         keyValueInfo->DataLength,
                         'hew');
 
-                    RtlCopyMemory(Value->Buffer, keyValueInfo->Data, keyValueInfo->DataLength);
-                    Value->MaximumLength = (USHORT) keyValueInfo->DataLength;
-                    Value->Length = (USHORT) keyValueInfo->DataLength;
+                    Value->MaximumLength = (USHORT)keyValueInfo->DataLength - sizeof(WCHAR); //hapus \0 (eof string)
+                    RtlCopyMemory(Value->Buffer, keyValueInfo->Data, Value->MaximumLength);                    
+                    Value->Length = Value->MaximumLength;
                 }
 
                 ExFreePoolWithTag(keyValueInfo, 'hew');
