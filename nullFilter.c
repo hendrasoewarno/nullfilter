@@ -40,6 +40,7 @@
 //UNICODE_STRING whitelistedFile = { sizeof(WHITELISTED_FILE) - sizeof(WCHAR), sizeof(WHITELISTED_FILE), WHITELISTED_FILE };
 //UNICODE_STRING suspiciousFile = { sizeof(SUSPICIOUS_FILE) - sizeof(WCHAR), sizeof(SUSPICIOUS_FILE), SUSPICIOUS_FILE };
 
+ULONG32 debugAll = 0x1;
 UNICODE_STRING executableExtension, allowedPath, whitelistedProcess, whitelistedFile, suspiciousFile;
 
 typedef struct _NULL_FILTER_DATA {
@@ -127,6 +128,8 @@ FLT_PREOP_CALLBACK_STATUS FLTAPI PreOperationCreate(
        
         ULONG processId = FltGetRequestorProcessId(Data);
 
+        char processInfo[2000];
+
         if (processId > 0) {
 
             PEPROCESS eProcess = FltGetRequestorProcess(Data);
@@ -137,7 +140,8 @@ FLT_PREOP_CALLBACK_STATUS FLTAPI PreOperationCreate(
                 RtlZeroMemory(processName, maximumLength);
                 status = SeLocateProcessImageName(eProcess, &processName);
                 if (NT_SUCCESS(status)) {
-                    DbgPrint("IRP_MJ_CREATE from pid %d(%wZ)\n", processId, processName);
+                    sprintf(processInfo, "IRP_MJ_CREATE from pid %d(%wZ)\n", processId, processName);
+                    //DbgPrint("IRP_MJ_CREATE from pid %d(%wZ)\n", processId, processName);
                 }
 
                 UNICODE_STRING lcaseProcessName;
@@ -209,43 +213,64 @@ FLT_PREOP_CALLBACK_STATUS FLTAPI PreOperationCreate(
                                     RtlDowncaseUnicodeString(&fullname, &DosName, TRUE);
 
                                     if (isContainSubstr(&fullname, &whitelistedFile)) {
-                                        DbgPrint("(Whitelisted[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                        if (debugAll == 0x1) {
+                                            DbgPrint(processInfo);
+                                            DbgPrint("(Whitelisted[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                        }
                                     }
                                     else if (isContainSubstr(&fullname, &suspiciousFile)) {
+                                        DbgPrint(processInfo);
                                         DbgPrint("(Suspicious[0x%08x]->Blocked) %wZ \n", desiredAccess, &fullname);
                                         Data->IoStatus.Status = STATUS_ACCESS_DENIED;
                                         Data->IoStatus.Information = 0;
                                         result = FLT_PREOP_COMPLETE;
                                     }
                                     else if (byPassByProcess) {
-                                        DbgPrint("(ByProcess[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                        if (debugAll == 0x1) {
+                                            DbgPrint(processInfo);
+                                            DbgPrint("(ByProcess[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                        }
                                     }
                                     else if (isEndsWith(&fullname, &executableExtension)) {
                                         BOOLEAN isAllowedPath = isContainSubstr(&fullname, &allowedPath);
                                         if (isAllowedPath && FlagOn(desiredAccess, FILE_EXECUTE)) {
-                                            DbgPrint("(Execute[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                            if (debugAll == 0x1) {
+                                                DbgPrint(processInfo);
+                                                DbgPrint("(Execute[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                            }
                                         }
                                         if (isAllowedPath) {
-                                            DbgPrint("(Access[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                            if (debugAll == 0x1) {
+                                                DbgPrint(processInfo);
+                                                DbgPrint("(Access[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                            }
                                         }
                                         else if (!isAllowedPath && FlagOn(desiredAccess, FILE_EXECUTE)) {
+                                            DbgPrint(processInfo);
                                             DbgPrint("(Execute[0x%08x]->Block) %wZ \n", desiredAccess, &fullname);
                                             Data->IoStatus.Status = STATUS_NO_SUCH_PRIVILEGE;
                                             Data->IoStatus.Information = 0;
                                             result = FLT_PREOP_COMPLETE;
                                         }
                                         else if (!isAllowedPath && FlagOn(desiredAccess, FILE_WRITE_DATA | FILE_APPEND_DATA)) {
+                                            DbgPrint(processInfo);
                                             DbgPrint("(Write[0x%08x]->Block) %wZ \n", desiredAccess, &fullname);
                                             Data->IoStatus.Status = STATUS_NO_SUCH_PRIVILEGE;
                                             Data->IoStatus.Information = 0;
                                             result = FLT_PREOP_COMPLETE;
                                         }
                                         else {
-                                            DbgPrint("(Others[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                            if (debugAll == 0x1) {
+                                                DbgPrint(processInfo);
+                                                DbgPrint("(Others[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                            }
                                         }
                                     }
-                                    else {                                        
-                                        DbgPrint("(Regular[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                    else {
+                                        if (debugAll == 0x1) {
+                                            DbgPrint(processInfo);
+                                            DbgPrint("(Regular[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                                        }
                                     }
 
                                     RtlFreeUnicodeString(&fullname);  // Free the memory
@@ -270,43 +295,64 @@ FLT_PREOP_CALLBACK_STATUS FLTAPI PreOperationCreate(
                 RtlDowncaseUnicodeString(&fullname, &fileNameInfo->Name, TRUE);
 
                 if (isContainSubstr(&fullname, &whitelistedFile)) {
-                    DbgPrint("(Whitelisted[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                    if (debugAll == 0x1) {
+                        DbgPrint(processInfo);
+                        DbgPrint("(Whitelisted[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                    }
                 }
                 else if (isContainSubstr(&fullname, &suspiciousFile)) {
+                    DbgPrint(processInfo);
                     DbgPrint("(Suspicious[0x%08x]->Blocked) %wZ \n", desiredAccess, &fullname);
                     Data->IoStatus.Status = STATUS_ACCESS_DENIED;
                     Data->IoStatus.Information = 0;
                     result = FLT_PREOP_COMPLETE;
                 }
                 else if (byPassByProcess) {
-                    DbgPrint("(ByProcess[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                    if (debugAll == 0x1) {
+                        DbgPrint(processInfo);
+                        DbgPrint("(ByProcess[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                    }
                 }
                 else if (isEndsWith(&fullname, &executableExtension)) {
                     BOOLEAN isAllowedPath = isContainSubstr(&fullname, &allowedPath);
                     if (isAllowedPath && FlagOn(desiredAccess, FILE_EXECUTE)) {
-                        DbgPrint("(Execute[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                        if (debugAll == 0x1) {
+                            DbgPrint(processInfo);
+                            DbgPrint("(Execute[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                        }
                     }
                     if (isAllowedPath) {
-                        DbgPrint("(Access[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                        if (debugAll == 0x1) {
+                            DbgPrint(processInfo);
+                            DbgPrint("(Access[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                        }
                     }
                     else if (!isAllowedPath && FlagOn(desiredAccess, FILE_EXECUTE)) {
+                        DbgPrint(processInfo);
                         DbgPrint("(Execute[0x%08x]->Block) %wZ \n", desiredAccess, &fullname);
                         Data->IoStatus.Status = STATUS_NO_SUCH_PRIVILEGE;
                         Data->IoStatus.Information = 0;
                         result = FLT_PREOP_COMPLETE;
                     }
                     else if (!isAllowedPath && FlagOn(desiredAccess, FILE_WRITE_DATA | FILE_APPEND_DATA)) {
+                        DbgPrint(processInfo);
                         DbgPrint("(Write[0x%08x]->Block) %wZ \n", desiredAccess, &fullname);
                         Data->IoStatus.Status = STATUS_NO_SUCH_PRIVILEGE;
                         Data->IoStatus.Information = 0;
                         result = FLT_PREOP_COMPLETE;
                     }
                     else {
-                        DbgPrint("(Others[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                        if (debugAll == 0x1) {
+                            DbgPrint(processInfo);
+                            DbgPrint("(Others[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                        }
                     }
                 }
                 else {
-                    DbgPrint("(Regular[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                    if (debugAll == 0x1) {
+                        DbgPrint(processInfo);
+                        DbgPrint("(Regular[0x%08x]->Passed) %wZ \n", desiredAccess, &fullname);
+                    }
                 }
 
                 RtlFreeUnicodeString(&fullname);  // Free the memory
@@ -366,35 +412,41 @@ DriverEntry (
 
     //UNREFERENCED_PARAMETER( RegistryPath );
 
-    status = ReadRegistryValueFromMiniFilter(RegistryPath, L"ExecutableExtension", &executableExtension);
+    status = ReadRegistryDWValueFromMiniFilter(RegistryPath, L"DebugAll", &debugAll);
+    if (!NT_SUCCESS(status)) {
+        DbgPrint("Failed to load DebugAll, Using default setting\n");
+    }
+    DbgPrint("DebugAll=%lu\n", &debugAll);
+
+    status = ReadRegistrySZValueFromMiniFilter(RegistryPath, L"ExecutableExtension", &executableExtension);
     if (!NT_SUCCESS(status)) {
         DbgPrint("Failed to load ExecutableExtension, Using default setting\n");
         RtlInitUnicodeString(&executableExtension, EXECUTABLE_EXTENSION);
     }
     DbgPrint("ExecutableExtension=%wZ\n", &executableExtension);
 
-    status = ReadRegistryValueFromMiniFilter(RegistryPath, L"AllowedPath", &allowedPath);
+    status = ReadRegistrySZValueFromMiniFilter(RegistryPath, L"AllowedPath", &allowedPath);
     if (!NT_SUCCESS(status)) {
         DbgPrint("Failed to load AllowedPath, Using default setting\n");
         RtlInitUnicodeString(&allowedPath, ALLOWED_PATH);
     }
     DbgPrint("AllowedPath=%wZ\n", &allowedPath);
 
-    status = ReadRegistryValueFromMiniFilter(RegistryPath, L"WhitelistedProcess", &whitelistedProcess);
+    status = ReadRegistrySZValueFromMiniFilter(RegistryPath, L"WhitelistedProcess", &whitelistedProcess);
     if (!NT_SUCCESS(status)) {
         DbgPrint("Failed to load WhitelistedProcess, Using default setting\n");
         RtlInitUnicodeString(&whitelistedProcess, WHITELISTED_PROCESS);
     }
     DbgPrint("WhitelistedProcess=%wZ\n", &whitelistedProcess);
 
-    status = ReadRegistryValueFromMiniFilter(RegistryPath, L"WhitelistedFile", &whitelistedFile);
+    status = ReadRegistrySZValueFromMiniFilter(RegistryPath, L"WhitelistedFile", &whitelistedFile);
     if (!NT_SUCCESS(status)) {
         DbgPrint("Failed to load WhitelistedFile, Using default setting\n");
         RtlInitUnicodeString(&whitelistedFile, WHITELISTED_FILE);
     }
     DbgPrint("WhitelistedFile=%wZ\n", &whitelistedFile);
 
-    status = ReadRegistryValueFromMiniFilter(RegistryPath, L"SuspiciousFile", &suspiciousFile);
+    status = ReadRegistrySZValueFromMiniFilter(RegistryPath, L"SuspiciousFile", &suspiciousFile);
     if (!NT_SUCCESS(status)) {
         DbgPrint("Failed to load SuspiciousFile, Using default setting\n");
         RtlInitUnicodeString(&suspiciousFile, SUSPICIOUS_FILE);
